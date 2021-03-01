@@ -2,12 +2,13 @@ from datetime import timedelta, datetime
 
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
+from airflow.operators.latest_only_operator import LatestOnlyOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2021, 2, 28, 20, 12, 0),
+    'start_date': datetime(2021, 2, 27, 18, 54, 0),
     'email': ['airflow@example.com'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -22,9 +23,12 @@ dag = DAG(
     schedule_interval=timedelta(seconds=60),
 )
 
+latest_only = LatestOnlyOperator(task_id='latest_only', dag=dag)
+
 git_pull = BashOperator(
     task_id='git_pull',
     bash_command='git -C /root/airflow/dags/ pull',
     dag=dag,
 )
 
+latest_only >> git_pull
