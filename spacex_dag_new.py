@@ -14,11 +14,11 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-dag = DAG("spacex", default_args=default_args, schedule_interval="0 0 1 1 *")
+dag = DAG("spacex_new", default_args=default_args, schedule_interval="0 0 1 1 *")
 
 t1 = BashOperator(
     task_id="get_data", 
-    bash_command="python3 /root/airflow/dags/spacex/load_launches.py -y {{ execution_date.year }} -o /var/data", 
+    bash_command="python3 /root/airflow/dags/spacex/load_launches.py -y {{{{ execution_date.year }}}} -o /var/data{}".format(" -r {{ params.rocket }}" if rocket !='all' else ""), 
     dag=dag
 )
 
